@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "coges"
+version = "0.8.0"
+description = "Library for implementing non-linear behaviour and stream processing"
+authors = ["Jellyfish.tech <manager@jellyfish.tech>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,10 @@
+* Coges
+Library for implementing non-linear behaviour and stream processing
+
+** Features
+- Predicate -> Action based flow control
+- Can be used as multi-state and single-state finite machine
+- Built-in dependency injector with lazy resolving and dependency tree
+- Functional approach
+- Concurrent predicate and action running
+- State checks are connected to your stream
