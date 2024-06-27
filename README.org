@@ -1,10 +1,20 @@
 * Coges
-Library for implementing non-linear behaviour and stream processing
+Alternative approach to async applications
+
+Software in beta state, proceed with caution
+
+** Usage
+*** Chat-bot
+*** Dataset analysis
 
 ** Features
-- Predicate -> Action based flow control
-- Can be used as multi-state and single-state finite machine
-- Built-in dependency injector with lazy resolving and dependency tree
-- Functional approach
-- Concurrent predicate and action running
-- State checks are connected to your stream
+*** Predicate -> Action based control flow
+*** Can be used as multi-state and single-state finite machine
+*** Built-in dependency injector with lazy resolving and dependency tree
+*** Functional approach
+*** Concurrent predicate and action running
+*** Zero dependencies
+** Python version
+3.10
+* Changelog (0.9.0)
+- tick now should be asyncgenerator

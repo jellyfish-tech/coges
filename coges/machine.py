@@ -1,18 +1,30 @@
+import logging
 import asyncio
 import typing as t
 
 from coges.coge import Coge
-from loguru import logger
 
 
-class MachineMeta(t.TypedDict):
+logger = logging.getLogger(__name__)
+
+
+Params = t.ParamSpec("Params")
+TickYield = t.TypeVar("TickYield")
+TickSend = t.TypeVar("TickSend")
+
+
+class WithMeta(t.Protocol):
     tick: t.Any
     active_coges: list[str]
     results: dict[str, t.Any]
 
+    def update(self, data: dict[str, t.Any]) -> None:
+        ...
 
-TickFn = t.Generator[t.Any, t.Any, t.Any]
-State = t.Union[t.Dict[str, t.Any], MachineMeta]
+
+TickFn = t.AsyncGenerator[TickSend, TickYield]
+InitialState = t.Dict[str, t.Any]
+State = t.Union[InitialState, WithMeta]
 Machine = t.Callable[[], t.Coroutine[t.Any, t.Any, None]]
 
 
@@ -73,15 +85,19 @@ def validate_coges(coges: list[Coge]) -> None:
 
 
 def create_machine(
-    coges: list[Coge], tick_fn: TickFn, di_resolver=identity, initial_state: State = {}
+    coges: list[Coge],
+    tick_fn: TickFn,
+    di_resolver=identity,
+    initial_state: InitialState = {},
 ) -> Machine:
     validate_coges(coges)
 
     state: State = dict(tick=None, results=dict(), active_coges=list(), **initial_state)
+
     logger.debug(f"starting machine with coges: {coges}")
 
-    async def __machine():
-        for tick in tick_fn:
+    async def __machine() -> None:
+        async for tick in tick_fn:
             logger.debug(f"new tick: '{tick}'")
             state.update({"tick": tick})
             logger.debug(f"choosing active coges for tick '{tick}'")

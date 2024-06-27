@@ -1,9 +1,11 @@
 import typing as t
 
 
-State = t.Dict[str, t.Any]
-PredicateFn = t.Callable[..., t.Coroutine[t.Any, t.Any, bool]]
-ActionFn = t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]
+Params = t.ParamSpec("Params")
+
+
+PredicateFn = t.Callable[Params, t.Coroutine[t.Any, t.Any, bool]]
+ActionFn = t.Callable[Params, t.Coroutine[t.Any, t.Any, t.Any]]
 
 
 class CogeError(Exception):

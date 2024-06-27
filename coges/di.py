@@ -1,6 +1,7 @@
+import typing as t
 import logging
 import inspect
-from functools import lru_cache, partial
+from functools import partial
 
 logger = logging.getLogger(__name__)
 
@@ -12,13 +13,15 @@ def __async_partial(fn, *args, **kwargs):
     return inner
 
 
-# TODO: maybe value of a dependency itself might be inner class with __call__, __index__, __getattr__ etc methods implemented. That will allow
-# TODO: dependencies to be truly lazy and waking up only on usage, not when they are present in parameters
+def __empty_generator():
+    yield
+
+
 class Dependency:
     def __init__(self, resolver):
         self.name = ""
         self.__resolver = resolver
-        self.__factory = (None for _ in range(1))
+        self.__factory = __empty_generator
         self.__instance = None
         self.__value = None
 
@@ -41,6 +44,8 @@ class Dependency:
 
     @instance.setter
     def instance(self, value):
+        if self.__instance is not None:
+            raise RuntimeError(f"{self.name} instance is already set")
         self.__instance = value
 
     @instance.deleter
@@ -54,11 +59,17 @@ class Dependency:
             del self.__instance
         else:
             raise RuntimeError(
-                f"{self.name} instance is not exhausted. Factory should contain only one yield statement"
+                f"""{self.name} instance is not exhausted.
+                Factory should contain only one yield statement"""
             )
 
     @property
     def value(self):
+        """
+        Lazylly resolves the dependency and returns its value
+
+        :return: The value of the dependency
+        """
         self.__wake_up() if self.__instance is None else None
         return self.__value
 
@@ -75,7 +86,7 @@ class Dependency:
         del self.instance
 
 
-def create_dependency_injector():  # noqa: C901 sue me
+def create_dependency_injector() -> t.Any:
     dependencies: set[Dependency] = set()
 
     def resolve(fn):
